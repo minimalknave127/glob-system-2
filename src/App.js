@@ -14,12 +14,12 @@ import { Dodavky } from "./pages/dodavky";
 import { Home } from "./pages/home";
 // pages
 import Login from "./pages/login";
-import Objednavky from "./pages/objednavky";
-import { Tender } from "./pages/tender";
+import Objednavky from "./pages/objednavky/index";
+import { Tender } from "./pages/tender/index";
 import { NotFound } from "./pages/notfound";
 import { ExcelConverter } from "./components/modules/excel-converter";
 import { Test } from "./pages/test";
-import Projects from "./pages/projects";
+import Projects from "./pages/projects/index";
 
 class App extends React.Component {
   constructor() {

@@ -15,13 +15,16 @@ const useStyles = makeStyles((theme) => ({
   cardTitle: {
     color: theme.palette.grey[800],
     fontWeight: 500,
-    fontSize: theme.typography.pxToRem(16),
+    fontSize: theme.typography.pxToRem(20),
     margin: theme.spacing(1.5),
   },
   cardHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  children: {
+    paddingLeft: theme.spacing(0),
   },
 }));
 const PaperCard = (props) => {
@@ -34,7 +37,7 @@ const PaperCard = (props) => {
             {props.title}
           </Typography>
         </div>
-        <div>{props.children}</div>
+        <div className={classes.children}>{props.children}</div>
       </CardContent>
     </Card>
   );

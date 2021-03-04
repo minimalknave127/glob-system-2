@@ -1,4 +1,5 @@
 import { DataGrid } from "@material-ui/data-grid";
+import MUIDataTable from "mui-datatables";
 import { makeStyles } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
@@ -7,10 +8,11 @@ import { useHistory } from "react-router-dom";
 // import { ShowOrder } from "../components/objednavky/order";
 //import { ShowOrders } from "../components/objednavky/show-orders";
 import moment from "moment";
-import { GlobHeader } from "../design/glob";
-import PaperCard from "../design/glob-pack/cards/paper-card";
+import { GlobHeader } from "../../../components/design/glob";
+import PaperCard from "../../../components/design/glob-pack/cards/paper-card";
 import axios from "axios";
 import { Chip } from "@material-ui/core";
+import { MUIDataTableLocaleCZ } from "../../../locale/locale-datagrid";
 const { REACT_APP_BACKEND_URL } = process.env;
 
 const useStyles = makeStyles((theme) => ({
@@ -39,16 +41,6 @@ const ShowOrders = () => {
   const [orders, setOrders] = useState([]);
   const [, setLoading] = useState(false);
   let history = useHistory();
-
-  // eslint-disable-next-line default-case
-  //   switch (action) {
-  //     case "new":
-  //       return <NewOrder />;
-  //     case "showOrder":
-  //       return <ShowOrder />;
-  //     case "finder":
-  //       return <Finder />;
-  //   }
   const handleClick = (id) => {
     history.push("/objednavky/" + id);
   };
@@ -64,7 +56,8 @@ const ShowOrders = () => {
       feedback = "V pořádku";
       type = classes.successChip;
     }
-    return [feedback, type];
+    return `${feedback}+${type}`;
+    // return [feedback, type];
   };
   const getOrders = () => {
     const url = REACT_APP_BACKEND_URL + "api/orders";
@@ -76,7 +69,7 @@ const ShowOrders = () => {
           id: order.ObjednavkaID,
           deliveryPlace: order.SkladJmeno,
           orderedBy: order.Jmeno + " " + order.Prijmeni,
-          deliveryDate: order.PozDatumDodani,
+          deliveryDate: moment(order.PozDatumDodani).format("DD.MM.YYYY"),
           status: checkDate(order.PozDatumDodani),
         });
       });
@@ -84,53 +77,63 @@ const ShowOrders = () => {
     });
   };
   const columns = [
-    { field: "id", headerName: "Číslo objednávky", width: 200 },
     {
-      field: "deliveryPlace",
-      headerName: "Místo doručení",
+      name: "id",
+      label: "Číslo objednávky",
+      width: 200,
+      options: { filter: false },
+    },
+    {
+      name: "deliveryPlace",
+      label: "Místo doručení",
       width: 200,
     },
-    { field: "orderedBy", headerName: "Objednal", width: 200 },
+    { name: "orderedBy", label: "Objednal", width: 200 },
     {
-      field: "deliveryDate",
-      headerName: "Požad. čas doruč.",
-      width: 400,
+      name: "deliveryDate",
+      label: "Požad. čas doruč.",
+      width: 200,
+      options: {
+        filter: false,
+      },
     },
     {
-      field: "status",
-      headerName: "Status",
-      width: 400,
-      renderCell: (params) => {
-        if (params)
-          return <Chip label={params.value[0]} className={params.value[1]} />;
+      name: "status",
+      label: "Status",
+      width: 150,
+      options: {
+        filter: true,
+        filterOptions: {
+          renderValue: (v) => (v ? v.split("+")[0] : ""),
+        },
+        sortCompare: (order) => ({ data: first }, { data: second }) => {
+          const firstItem = first.split("+")[0];
+          const secondItem = second.split("+")[0];
+          const items = [firstItem, secondItem];
+          let returnNumber;
+          if (firstItem === "V pořádku") {
+            returnNumber = 10000;
+          } else if (firstItem === "Poslední den" && secondItem !== "Pozdě") {
+            returnNumber = 222;
+          } else {
+            returnNumber = 1000;
+          }
+          return order === "asc" ? returnNumber : returnNumber * -1;
+        },
+        customBodyRender: (value, tableMeta, updateValue) => {
+          const values = value.split("+");
+          if (value) return <Chip label={values[0]} className={values[1]} />;
+        },
       },
     },
   ];
+  const options = {
+    filterType: "checkbox",
+    ...MUIDataTableLocaleCZ,
+  };
   useEffect(() => {
     getOrders();
   }, []);
-  // if all orders - fetch data
-
-  //   const rows = [
-  //     { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  //     { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  //     { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  //     { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  //     { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  //     { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  //     { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  //     { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  //     { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-  //     { id: 10, lastName: "Roxie", firstName: "Harvey", age: 65 },
-  //     { id: 11, lastName: "Roxie", firstName: "Harvey", age: 65 },
-  //     { id: 12, lastName: "Roxie", firstName: "Harvey", age: 65 },
-  //   ];
-
-  // if (action == "new") {
-  //     return <NewOrder />
-  // } else if (action == "showOrder") {
-  //     return <ShowOrder />
-  // }
 
   return (
     <React.Fragment>
@@ -144,19 +147,14 @@ const ShowOrders = () => {
       )}
       <section className="mt-5">
         {/* {action === "archive" ? <ShowOrders archive /> : <ShowOrders />} */}
-        <PaperCard title="Objednávky">
-          <DataGrid
-            autoHeight
-            className={classes.table}
-            rows={orders}
-            columns={columns}
-            disableColumnMenu
-            pageSize={10}
-            rowsPerPageOptions={[]}
-            disableSelectionOnClick
-            onRowClick={(e) => handleClick(e.row.id)}
-          />
-        </PaperCard>
+        {/* <PaperCard> */}
+        <MUIDataTable
+          options={options}
+          data={orders}
+          columns={columns}
+          onRowClick={(e) => handleClick(e.row.id)}
+        />
+        {/* </PaperCard> */}
       </section>
       {/* </MDBNavLink> */}
     </React.Fragment>

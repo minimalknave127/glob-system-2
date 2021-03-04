@@ -6,18 +6,18 @@ import Link from "@material-ui/core/Link";
 import Typography from "@material-ui/core/Typography";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import * as backendData from "../../backend/config.json";
-import { AskAlert } from "../ask";
-import { GlobCard, GlobCardSection } from "../design/card";
+import { AskAlert } from "../../../components/ask";
+import { GlobCard, GlobCardSection } from "../../../components/design/card";
 import { OrderItem, OrderItems } from "./orderitem";
 import moment from "moment";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Snackbar } from "@material-ui/core";
+import { useParams } from "react-router-dom";
+const { REACT_APP_BACKEND_URL } = process.env;
 
 export const ShowOrder = () => {
   //Getting URL PARAMS (ORDER ID)
-  const url = new URL(window.location.href);
-  const orderId = url.searchParams.get("orderId");
+  const { id } = useParams();
   const [status, setStatus] = useState(false);
   const [orderItems, setOrderItems] = useState([]);
   const [deadline, setDeadline] = useState("");
@@ -35,9 +35,9 @@ export const ShowOrder = () => {
 
   // Move order to archive
   const handleDelete = () => {
-    const url = backendData.backend_url + "archive-order.php";
+    const url = REACT_APP_BACKEND_URL + "api/orders/archive";
     let formData = new FormData();
-    formData.append("orderid", orderId);
+    formData.append("id", id);
     axios
       .post(url, formData)
       .then((res) => {
@@ -52,7 +52,7 @@ export const ShowOrder = () => {
 
   // Accept the order and move materials to the system
   const handleAccept = () => {
-    const url = backendData.backend_url + "api/orders/" + orderId;
+    const url = REACT_APP_BACKEND_URL + "api/orders/" + id;
     axios
       .get(url)
       .then((res) => {
@@ -63,7 +63,7 @@ export const ShowOrder = () => {
       });
   };
   const getOrder = () => {
-    const url = backendData.backend_url + "api/orders/" + orderId;
+    const url = REACT_APP_BACKEND_URL + "api/orders/" + id;
     axios
       .get(url)
       .then((res) => {
@@ -170,7 +170,7 @@ export const ShowOrder = () => {
         ) : null}
         <section className="orderInfo">
           <h6>
-            Číslo objednávky: <strong>{orderId}</strong>
+            Číslo objednávky: <strong>{id}</strong>
           </h6>{" "}
           <br />
           <h6>
@@ -205,9 +205,9 @@ export const ShowOrder = () => {
           <Typography>
             <Link
               href={
-                backendData.backend_url +
+                REACT_APP_BACKEND_URL +
                 "soubory/objednavky/objednavka-" +
-                orderId +
+                id +
                 ".pdf"
               }
               rel="noreferrer"
