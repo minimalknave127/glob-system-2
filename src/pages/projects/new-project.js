@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useRef, useEffect } from "react";
 import { GlobHeader, GlobPaper } from "../../components/design/glob";
 import {
-  Paper,
   Typography,
   makeStyles,
   TextField,

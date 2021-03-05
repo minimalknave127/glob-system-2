@@ -42,7 +42,7 @@ export const TenderSecondStep = (props) => {
           checkboxSelection
           localeText={LocaleText}
           disableColumnFilter
-          onSelectionChange={(e) => setSuppliers(e.rowIds)}
+          onSelectionModelChange={(e) => setSuppliers(e.selectionModel)}
         />
       </div>
     </GlobCardSection>

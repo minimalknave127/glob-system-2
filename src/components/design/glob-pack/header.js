@@ -4,6 +4,7 @@ import {
   createMuiTheme,
   ThemeProvider,
   makeStyles,
+  Button,
 } from "@material-ui/core";
 
 const theme = createMuiTheme();
@@ -26,6 +27,12 @@ const useStyles = makeStyles((theme) => ({
   divider: {
     marginBottom: theme.spacing(2),
   },
+  headerButton: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
 }));
 const Header = (props) => {
   const classes = useStyles();
@@ -40,6 +47,17 @@ const Header = (props) => {
         </Typography>
       </ThemeProvider>
       <hr className={classes.divider} />
+      {props.createButton ? (
+        <div className={classes.headerButton}>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={props.onCreateButtonClick}
+          >
+            {props.createButtonLabel ?? "Nový"}
+          </Button>
+        </div>
+      ) : null}
     </Fragment>
   );
 };

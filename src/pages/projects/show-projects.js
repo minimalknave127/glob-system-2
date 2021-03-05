@@ -37,16 +37,10 @@ const ShowProjects = (props) => {
       <GlobHeader
         title="Projekty - přehled"
         desc="Přehled stavebních projektů"
+        createButton
+        createButtonLabel="Nový projekt"
+        onCreateButtonClick={() => props.history.push("/projekty/novy")}
       />
-      <div className={classes.headerButton}>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={() => props.history.push("/projekty/novy")}
-        >
-          Nový projekt
-        </Button>
-      </div>
       <section className={classes.projects}>
         <MediaCard
           className={classes.projectCard}
